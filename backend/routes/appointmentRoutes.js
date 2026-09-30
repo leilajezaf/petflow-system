@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const { getPets, createPet } = require('../controllers/petController');
+const { getAppointments, createAppointment } = require('../controllers/appointmentController');
 
 // GET /api/pets -> Obtener todas las mascotas
-router.get('/', getPets);
+router.get('/', getAppointments);
 
 // POST /api/pets -> Crear una nueva mascota
-router.post('/', createPet);
+router.post('/', createAppointment);
 
 module.exports = router;
