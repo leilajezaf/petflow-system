@@ -4,12 +4,23 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const { MercadoPagoConfig, Preference } = require('mercadopago');
 
+// Models
 const Pet = require('./models/Pet');
 const Appointment = require('./models/Appointment');
 
+// 1. IMPORTAR RUTAS AQUÍ
+const petRoutes = require('./routes/petRoutes');
+const appointmentRoutes = require('./routes/appointmentRoutes');
+
 const app = express();
+
+// Middlewares globales
 app.use(cors());
 app.use(express.json());
+
+// 2. REGISTRAR RUTAS AQUÍ
+app.use('/api/pets', petRoutes);
+app.use('/api/appointments', appointmentRoutes);
 
 // Conexión a MongoDB
 mongoose.connect(process.env.MONGO_URI)
@@ -18,6 +29,7 @@ mongoose.connect(process.env.MONGO_URI)
     console.error('Error de conexión a MongoDB:', err.message);
     console.log('Ejecutando motor en memoria para pruebas.');
   });
+
 // Inicialización de Mercado Pago SDK v3
 const client = new MercadoPagoConfig({ 
   accessToken: process.env.MP_ACCESS_TOKEN || 'TEST-ACCESS-TOKEN' 
