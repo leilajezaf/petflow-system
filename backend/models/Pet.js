@@ -9,8 +9,18 @@ const petSchema = new mongoose.Schema({
   weightKg: { type: Number, required: true },
   coatType: { 
     type: String, 
-    enum: ['SHORT', 'MEDIUM', 'LONG', 'MATTED_MUDANDO'], 
-    default: 'SHORT' 
+    enum: ['corto_raso',
+      'corto_doble_desmuda',
+      'manto_doble_medio',
+      'manto_doble_largo',
+      'manto_nordico_denso',
+      'pelo_largo_lacio',
+      'pelo_mota_rizado',
+      'pelo_duro_alambre',
+      'pelo_encordado',
+      'sin_pelo',
+      'anudado_fieltrado'], 
+    default: 'corto_raso' 
   },
   healthConditions: {
     hasJointPain: { type: Boolean, default: false },

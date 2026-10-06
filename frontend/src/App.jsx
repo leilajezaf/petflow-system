@@ -1,122 +1,70 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import React, { useState } from 'react';
+import PetForm from './components/PetForm';
+import PetList from './components/PetList';
+import AppointmentForm from './components/AppointmentForm';
+import AppointmentList from './components/AppointmentList';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [refreshPets, setRefreshPets] = useState(0);
+  const [refreshAppointments, setRefreshAppointments] = useState(0);
+
+  // Se dispara al registrar una mascota para actualizar PetList y el select de AppointmentForm
+  const handlePetAdded = () => {
+    setRefreshPets((prev) => prev + 1);
+  };
+
+  // Se dispara al agendar un turno para actualizar la lista AppointmentList
+  const handleAppointmentCreated = () => {
+    setRefreshAppointments((prev) => prev + 1);
+  };
+
+  // Función para redirigir al usuario al link de pago de Mercado Pago
+  const handlePayClick = async (appointment) => {
+    try {
+      const response = await fetch('http://localhost:5000/api/appointments/create-preference', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ appointmentId: appointment._id })
+      });
+
+      const data = await response.json();
+
+if (!response.ok) {
+      throw new Error(data.message || 'Error en el servidor');
+    }
+
+      if (data.init_point) {
+        // Redirige directamente al Checkout Pro de Mercado Pago
+        window.location.href = data.init_point;
+     } else {
+      alert('No se pudo obtener el enlace de pago.');
+    }
+  } catch (error) {
+    alert(`Error al generar cobro: ${error.message}`);
+    }
+  };
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <div style={{ padding: '20px', fontFamily: 'sans-serif', backgroundColor: '#f9fafb', minHeight: '100vh' }}>
+      <h1 style={{ textAlign: 'center', color: '#111827', marginBottom: '24px' }}>
+        Gestión de Pet Shop & Peluquería
+      </h1>
 
-      <div className="ticks"></div>
+      {/* Formularios principales */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '32px' }}>
+        <PetForm onPetAdded={handlePetAdded} />
+        <AppointmentForm onAppointmentCreated={handleAppointmentCreated} />
+      </div>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+      <hr style={{ border: '0', borderTop: '1px solid #e5e7eb', margin: '32px 0' }} />
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+      {/* Listados de información */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+        <PetList refreshTrigger={refreshPets} />
+        <AppointmentList refreshTrigger={refreshAppointments} onPayClick={handlePayClick} />
+      </div>
+    </div>
+  );
 }
 
-export default App
+export default App;
